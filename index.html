@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel"MARIAS"</title>
+
+
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+</head>
+
+<body>
+<h1>bienvenidos a hotel las <b>"Las Marias"</b></h1>
+
+<p>En Hostal Estación Descansarás con Comodidad y Tranquilidad. Visítanos Hoy. Tu desayuno como en casa con la garantía
+  de Hostal Estación Marias.</p>
+
+
+<li>Los Mejores servicios</li>
+<li>La Mejor atencion</li>
+<li>La Mejor onda</li>
+<li>Veni a desconectarte del mundo</li>
+<li>Veni a hotel LAS MARIAS</li>
+
+<section class="inicio">
+  <div class="derecha">
+    <h4>ingresa aca y contanos que servicios te gustaria agregar</h4>
+    <button id="ir">click aqui</button>
+  </div>
+  <div class="izquierda">
+
+  </div>
+
+</section>
+
+
+
+
+<section class="button-carrito">
+  <button id="boton-carrito">Productos en 🛒: <i class="fas fa-shopping-cart"></i><span id="contadorCarrito"></span></button>
+</section>
+
+
+</div>
+<div class="seleccion">
+  <select id="selecHabitacion">
+    <option value="all">Todas</option>
+    <option value="cara">Caras</option>
+    <option value="media">Medias</option>
+    <option value="barata">Baratas</option>
+  </select>
+</div>
+
+<main id="contenedor-productos">
+
+</main>
+
+<div class="modal-contenedor">
+  <div class="modal-carrito">
+      <h3>Carrito</h3>
+      <button id="carritoCerrar"><i class="fas fa-times-circle-blue"></i></button>
+      <div id="carrito-contenedor">
+      </div>
+      <p class="precioProducto">Precio total: $<span id="precioTotal">0</span></p>
+      <div id="terminar" style="display: flex; justify-content: flex-end;"></div>
+  </div>
+</div>
+
+
+  <script src="js/stock.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/app.js"></script>
+  
+
+
+  </body>
+
+  </html>

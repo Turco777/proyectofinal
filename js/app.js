@@ -1,103 +1,130 @@
-let carritoDeCompras = []
+const contenedorProductos = document.getElementById('contenedor-productos')
 
-const contenedorProducto = document.getElementById('contenedor-productos')
-const contenedorCarritos = document.getElementById('carrito-contenedor')
 
-const botonTerminar = document.getElementById('terminar')
-const finCompra = document.getElementById('fin-compra')
+
+const contenedorCarrito = document.getElementById('carrito-contenedor')
+
+const botonVaciar = document.getElementById('vaciar-carrito')
 
 const contadorCarrito = document.getElementById('contadorCarrito')
-const precioTotal = document.getElementById('precioTotal')
 
-const link = document.getElementById('link')
+
+const cantidad = document.getElementById('cantidad')
+const precioTotal = document.getElementById('precioTotal')
+const cantidadTotal = document.getElementById('cantidadTotal')
+
+let carrito = []
+
+const comprarButton = document.querySelector('.comprarButton')
+comprarButton.addEventListener('click', ()=>{
+    realizarCompra()
+    Swal.fire({
+        title: 'Finalizada la compra',
+      text: 'Gracias por elegirnos',
+      icon: 'success',
+      })
+}
+)
+
 
 const button = document.getElementById('ir')
+let carritoDeCompras = []
 button.addEventListener("click", ()=> {
   location.href = "registrate.html"
 })
 
- mostrarProductos()
-
-function mostrarProductos(){
-stockHabitaciones.forEach(el =>{
-    let div = document.createElement('div')
-    div.classList.add('producto')
-    div.innerHTML =  ` <div class="producto">
-    <div class="card">
-      <div class="card-image">
-        <img src="${el.img}">
-        <span class="card-title">${el.nombre}</span>
-        <a id="boton${el.id}" class="btn-floating halfway-fab waves-effect waves-light "><i
-             class="material-icons">add_shopping_cart</i></a>
-      </div>
-      <div class="card-content">
-        <p>${el.desc}</p>
-        <p>${el.tipo}</p>
-        <p>$${el.precio}</p>
-      </div>
-    </div> `
-    contenedorProducto.appendChild(div)
-
-     let botonAgregar = document.getElementById(`boton${el.id}`)
+document.addEventListener('DOMContentLoaded', () => {
+        carrito = JSON.parse(localStorage.getItem('carrito')) || ['carrito vacio']
+        actualizarCarrito()
     
-      botonAgregar.addEventListener('click',()=>{
-
-       agregarAlCarrito(el.id);
-     
-      })
-     
-
-
 })
 
+botonVaciar.addEventListener('click', () => {
+    carrito.length = 0
+    actualizarCarrito()
+})
+
+
+stockProductos.forEach((producto) => {
+    const div = document.createElement('div')
+    div.classList.add('producto')
+    div.innerHTML = `
+    <img src=${producto?.img || "lo sentimos esta img no esta cargada"} alt= "">
+    <h3>${producto?.nombre || "lo sentimos tenemos unos problemas para cargar esta habitacion"}</h3>
+    <p>${producto?.desc || "lo sentimos estamos teniendo problemas"}</p>
+    <p>Talle: ${producto?.tipo || "lo sentimos estamos teniendo problemas para cargar la info"}</p>
+    <p class="precioProducto">Precio:$ ${producto.precio}</p>
+    <button id="agregar${producto.id}" class="boton-agregar">Agregar <i class="fas fa-shopping-cart"></i></button>
+    `
+    contenedorProductos.appendChild(div)
+
+  
+    const boton = document.getElementById(`agregar${producto.id}`)
+ 
+
+    boton.addEventListener('click', () => {
+     
+        agregarAlCarrito(producto.id)
+        
+    })
+})
+
+
+const agregarAlCarrito = (prodId) => {
+
+    
+    const existe = carrito.some (prod => prod.id === prodId) 
+
+    if (existe){
+        const prod = carrito.map (prod => {
+            if (prod.id === prodId){
+                prod.cantidad++
+            }
+        })
+    } else { 
+        const item = stockProductos.find((prod) => prod.id === prodId)
+        carrito.push(item)
+    }
+    
+    actualizarCarrito() 
 }
 
-function agregarAlCarrito(id){
+const eliminarDelCarrito = (prodId) => {
+    const item = carrito.find((prod) => prod.id === prodId)
 
-let habitacionAgregar = stockHabitaciones.find(item=>item.id === id)
-
-carritoDeCompras.push(habitacionAgregar)
-mostrarCarrito(habitacionAgregar)
-actualizarCarrito()
-guardarEnLs()
+    const indice = carrito.indexOf(item) 
+    carrito.splice(indice, 1) 
+    
+    actualizarCarrito() 
+    
 }
 
-function mostrarCarrito(habitacionAgregar){
+const actualizarCarrito = () => {
+   
+    contenedorCarrito.innerHTML = "" 
+    carrito.forEach((prod) => {
+        const div = document.createElement('div')
+        div.className = ('productoEnCarrito')
+        div.innerHTML = `
+        <p>${prod.nombre}</p>
+        <p>Precio:$${prod.precio}</p>
+        <p>Cantidad: <span id="cantidad">${prod.cantidad}</span></p>
+        <button onclick="eliminarDelCarrito(${prod.id})" class="boton-eliminar"><i class="fas fa-trash-alt"></i></button>
+        `
 
-  let div = document.createElement('div')
-  div.setAttribute('class','productocarrito')
-  div.innerHTML= `
-  <p>nombre:${habitacionAgregar.nombre}</p>
-<p>precio:${habitacionAgregar.precio}</p>
-<p>Descripcion:${habitacionAgregar.desc}</p>
-<button id="eliminar${habitacionAgregar.id}" class="btn btn-primary">borrar</button>
-<button id="pagar" class="btn btn-outline-success">pagar</button>
-  `
-  contenedorCarritos.appendChild(div)
+        contenedorCarrito.appendChild(div)
+        
+        localStorage.setItem('carrito', JSON.stringify(carrito))
 
-  let btnEliminar = document.getElementById(`eliminar${habitacionAgregar.id}`)
-  btnEliminar.addEventListener('click',()=>{
-  btnEliminar.parentElement.remove()
-  carritoDeCompras = carritoDeCompras.filter(elemento => elemento.id !== habitacionAgregar.id)
-  actualizarCarrito()
-  })
+    })
+    
+    contadorCarrito.innerText = carrito.length 
+    
+    precioTotal.innerText = carrito.reduce((acc, prod) => acc + prod.cantidad * prod.precio, 0)
+    
 }
 
-function actualizarCarrito(){
-contadorCarrito.innerText = carritoDeCompras.length
-precioTotal.innerText = carritoDeCompras.reduce((acc,el)=> acc + el.precio, 0)
-
-}
-
-
-function guardarEnLs(){
-  localStorage.setItem("carritoDeCompras", JSON.stringify(carritoDeCompras))
-}
-
-window.onload = function(){
-  const storage = JSON.parse(localStorage.getItem("carridoDeCompras"));
-  if(storage){
-    carritoDeCompras = storage;
-    mostrarCarrito()
-  }
+function realizarCompra(){
+    contenedorCarrito.innerHTML = "";
+    precioTotal.innerHTML = "0";
 }

@@ -1,5 +1,5 @@
 
-
+// aqui declare las variables
 
 const contenedorProductos = document.getElementById('contenedor-productos')
 
@@ -11,6 +11,11 @@ const botonVaciar = document.getElementById('vaciar-carrito')
 
 const contadorCarrito = document.getElementById('contadorCarrito')
 
+const comprarButton = document.querySelector('.comprarButton')
+
+const btnFinalizar = document.getElementById('submit')
+
+const button = document.getElementById('ir')
 
 const cantidad = document.getElementById('cantidad')
 const precioTotal = document.getElementById('precioTotal')
@@ -20,61 +25,50 @@ let carrito = []
 
 
 
-const comprarButton = document.querySelector('.comprarButton')
-comprarButton.addEventListener('click', ()=>{
-    realizarCompra()
-    Swal.fire({
-        title: 'Finalizada la compra',
-      text: 'Gracias por elegirnos',
-      icon: 'success',
-      })
-}
-)
-
-
-const button = document.getElementById('ir')
-let carritoDeCompras = []
-button.addEventListener("click", ()=> {
-  location.href = "registrate.html"
-})
-
-document.addEventListener('DOMContentLoaded', () => {
-        carrito = JSON.parse(localStorage.getItem('carrito')) || ['carrito vacio']
-        actualizarCarrito()
-    
-})
-
 botonVaciar.addEventListener('click', () => {
     carrito.length = 0
+    removerJson()
     actualizarCarrito()
 })
 
-const hola = stockProductos.forEach((producto) => {
+ fetch('stockHabitaciones.json') //muestro en pantalla las habitaciones
+.then (response => response.json())
+.then (habitaciones => {
+    mostrarContenido(habitaciones)
+ })
+ .catch(err=> console.log(err))
+
+ 
+ function mostrarContenido(habitaciones){
+ 
+habitaciones.forEach(contenido=>{
+    const{img, nombre, precio, id, desc, tipo} = contenido
     const div = document.createElement('div')
     div.classList.add('producto')
     div.innerHTML = `
-    <img src=${producto?.img || "lo sentimos esta img no esta cargada"} alt= "">
-    <h3>${producto?.nombre || "lo sentimos tenemos unos problemas para cargar esta habitacion"}</h3>
-    <p>${producto?.desc || "lo sentimos estamos teniendo problemas"}</p>
-    <p>Tipo: ${producto?.tipo || "lo sentimos estamos teniendo problemas para cargar la info"}</p>
-    <p class="precioProducto">Precio:$ ${producto.precio}</p>
-    <button id="agregar${producto.id}" class="boton-agregar">Agregar <i class="fas fa-shopping-cart"></i></button>
+    <img src=${img || "lo sentimos esta img no esta cargada"} alt= "">
+    <h3>${nombre || "lo sentimos tenemos unos problemas para cargar esta habitacion"}</h3>
+    <p>${desc || "lo sentimos estamos teniendo problemas"}</p>
+    <p>Tipo: ${tipo || "lo sentimos estamos teniendo problemas para cargar la info"}</p>
+    <p class="precioProducto">Precio:$ ${precio}</p>
+    <button id="agregar${id}" class="boton-agregar">Agregar <i class="fas fa-shopping-cart"></i></button>
     `
     contenedorProductos.appendChild(div)
 
   
-    const boton = document.getElementById(`agregar${producto.id}`)
+    const boton = document.getElementById(`agregar${id}`)
  
 
     boton.addEventListener('click', () => {
      
-        agregarAlCarrito(producto.id)
+        agregarAlCarrito(id)
         
     })
 })
 
-
-const agregarAlCarrito = (prodId) => {
+ }
+// funcion de agregarAlCarrito
+const agregarAlCarrito = (prodId) => {   
 
     
     const existe = carrito.some (prod => prod.id === prodId) 
@@ -89,16 +83,18 @@ const agregarAlCarrito = (prodId) => {
         const item = stockProductos.find((prod) => prod.id === prodId)
         carrito.push(item)
     }
-    
+    jsonCarrito()
     actualizarCarrito() 
 }
 
+
+// funcion de eliminar el producto
 const eliminarDelCarrito = (prodId) => {
     const item = carrito.find((prod) => prod.id === prodId)
 
     const indice = carrito.indexOf(item) 
-    carrito.splice(indice, 0) 
-    
+    carrito.splice(indice, 1) 
+    removerJson()
     actualizarCarrito() 
     
 }
@@ -107,18 +103,19 @@ const actualizarCarrito = () => {
    
     contenedorCarrito.innerHTML = "" 
     carrito.forEach((prod) => {
+        const {nombre, precio, cantidad, id} = prod
         const div = document.createElement('div')
         div.className = ('productoEnCarrito')
         div.innerHTML = `
-        <p>${prod.nombre}</p>
-        <p>Precio:$${prod.precio}</p>
-        <p>Cantidad: <span id="cantidad">${prod.cantidad}</span></p>
-        <button onclick="eliminarDelCarrito(${prod.id})"class="boton-eliminar"><i class="fas fa-trash-alt"></i></button>
+        <p>${nombre}</p>
+        <p>Precio:$${precio}</p>
+        <p>Cantidad: <span id="cantidad">${cantidad}</span></p>
+        <button onclick="eliminarDelCarrito(${id})"class="boton-eliminar"><i class="fas fa-trash-alt"></i></button>
         `
 
         contenedorCarrito.appendChild(div)
         
-        localStorage.setItem('carrito', JSON.stringify(carrito))
+       jsonCarrito()
 
     })
     
@@ -128,49 +125,47 @@ const actualizarCarrito = () => {
     
 }
 
+comprarButton.addEventListener('click', ()=>{
+   if(carrito.length > 0){  
+   location.href = "registrate.html"}else{
+    Swal.fire({
+        icon: 'error',
+        title: 'ups!',
+        text: 'por favor agrega productos al carrito para poder realizar esta accion',
+    })}
+})
+
 function realizarCompra(){
     contenedorCarrito.innerHTML = "";
     precioTotal.innerHTML = "0";
 }
 
-// fetch
-// =========
-// =========
-// DE LAS 2 FORMAS ANDA
-// fetch("/servicios.json")
-// .then((res) => res.json())
-// .then((data) => {
-//     data.forEach((servicio) => {
-//         const div = document.createElement("div")
-//         div.classList.add('producto')
-//         div.innerHTML = `
-//         <img src=${servicio.img} alt= "">
-//         <h4>${servicio.nombre}</h4>
-//         <p>desc: ${servicio.desc}</p>
-//         <p>precio: ${servicio.precio}</p>
-       
-        
-//         `
-//         servicios.append(div)
-//     })
-// })
-             
-const pedirDatos = async () => {
-    const respuesta = await fetch ("servicios.json")
-    const data = await respuesta.json();
-    data.forEach((servicio) => {
-                const div = document.createElement("div")
-                div.classList.add('producto')
-                div.innerHTML = `
-                <img src=${servicio.img} alt= "">
-                <h4>${servicio.nombre}</h4>
-                <p>desc: ${servicio.desc}</p>
-                <p>precio: ${servicio.precio}</p>
-               
-                
-                `
-                servicios.append(div)
-            })
-        }
+function removerJson() {
+    localStorage.removeItem("carrito")
+}
 
-pedirDatos()
+function jsonCarrito() {
+    localStorage.setItem("carrito", JSON.stringify(carrito))
+}
+// funcion para recuperar carrito
+
+class habitacioness {
+    constructor (nombre,precio,cantidad,) {
+        this.nombre = nombre
+        this.precio = precio
+        this.cantidad = cantidad
+    }
+}
+function recuperoJson() {
+    if (localStorage.length > 0){
+
+        carritoJson = JSON.parse(localStorage.getItem("carrito"))
+        carritoJson.forEach(producto => {
+            carrito.push(new habitacioness(producto.nombre, producto.precio, producto.cantidad, ))
+            actualizarCarrito()
+        });
+    }
+      
+}
+recuperoJson()
+             
